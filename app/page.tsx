@@ -78,15 +78,11 @@ function ElegantShape({
   );
 }
 
-export default function Home({
-  badge = "PairPlay 😶‍🌫️",
-  title1 = "Games for 2",
-  title2 = "Sparks for you",
-}: {
-  badge?: string;
-  title1?: string;
-  title2?: string;
-}) {
+export default function Home() {
+  const badge = "PairPlay 😶‍🌫️";
+  const title1 = "Games for 2";
+  const title2 = "Sparks for you";
+
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({

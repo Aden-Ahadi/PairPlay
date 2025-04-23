@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export default function Home() {
+export default function FlowerSVG() {
   useEffect(() => {
     const path = document.querySelector("#XMLID_226_") as SVGPathElement;
     if (path) {
@@ -17,7 +17,7 @@ export default function Home() {
         version="1.1"
         stroke="#880e4f"
         strokeWidth="2"
-        strokeLinejoin="square"
+        strokeLinejoin="miter"
         strokeLinecap="butt"
         strokeMiterlimit="5"
         strokeDasharray="600"
@@ -25,7 +25,6 @@ export default function Home() {
         x="0px"
         y="0px"
         viewBox="0 0 200 200"
-        style={{ enableBackground: "new 0 0 200 200" }}
       >
         <g id="XMLID_1_">
           <path
