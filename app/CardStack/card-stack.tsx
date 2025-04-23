@@ -21,7 +21,7 @@ interface CardData {
   };
 }
 
-// Sample data with Unsplash images
+// Optimized URLs with smaller image size parameters
 const initialCards: CardData[] = [
   {
     id: 1,
@@ -30,8 +30,9 @@ const initialCards: CardData[] = [
     description:
       "An undiscovered coastal jewel on the Gulf of Aqaba near the Red Sea, Magna will be a place like nothing on earth.",
     imageUrl:
-      "https://images.unsplash.com/photo-1518623489648-a173ef7824f3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2762&q=80",
+      "https://images.unsplash.com/photo-1518623489648-a173ef7824f3?ixlib=rb-4.0.3&w=500&q=80",
     icon: "bed",
+    // Default colors to show immediately
     colors: {
       primary: "#1a1a1a",
       secondary: "#333333",
@@ -46,7 +47,7 @@ const initialCards: CardData[] = [
     description:
       "Experience the pinnacle of coastal living with panoramic ocean views and world-class amenities.",
     imageUrl:
-      "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2760&q=80",
+      "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&w=500&q=80",
     icon: "users",
     colors: {
       primary: "#0f2b46",
@@ -62,7 +63,7 @@ const initialCards: CardData[] = [
     description:
       "Nestled between mountains and sea, this sustainable development offers the perfect balance of luxury and nature.",
     imageUrl:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2760&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&w=500&q=80",
     icon: "dollar",
     colors: {
       primary: "#2d4a22",
@@ -78,7 +79,7 @@ const initialCards: CardData[] = [
     description:
       "A revolutionary urban development that combines cutting-edge architecture with sustainable living solutions.",
     imageUrl:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2760&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&w=500&q=80",
     icon: "arrowUpRight",
     colors: {
       primary: "#5a3a31",
@@ -94,7 +95,7 @@ const initialCards: CardData[] = [
     description:
       "Where luxury meets the sea. Exclusive waterfront properties with private beaches and marina access.",
     imageUrl:
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2760&q=80",
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&w=500&q=80",
     icon: "bed",
     colors: {
       primary: "#1a3a5f",
@@ -105,68 +106,109 @@ const initialCards: CardData[] = [
   },
 ];
 
-export default function CardStack() {
-  const [cards, setCards] = useState<CardData[]>(initialCards);
-  const [loading, setLoading] = useState(true);
-  const [extractedColors, setExtractedColors] = useState<boolean>(false);
+// Helper function to load an image with timeout
+const loadImageWithTimeout = (url: string, timeout = 5000) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = url;
 
-  // Extract colors from images when component mounts
-  useEffect(() => {
-    const extractColors = async () => {
-      if (extractedColors) return;
+    // Set timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      reject(new Error("Image loading timeout"));
+    }, timeout);
 
-      const updatedCards = [...cards];
-      const colorThief = new ColorThief();
-
-      for (let i = 0; i < updatedCards.length; i++) {
-        const card = updatedCards[i];
-        try {
-          const img = new Image();
-          img.crossOrigin = "Anonymous";
-          img.src = card.imageUrl;
-
-          await new Promise((resolve) => {
-            img.onload = () => {
-              try {
-                const palette = colorThief.getPalette(img, 3);
-
-                // Convert RGB to hex and create color scheme
-                const primaryColor = `rgb(${palette[0][0]}, ${palette[0][1]}, ${palette[0][2]})`;
-                const secondaryColor = `rgb(${palette[1][0]}, ${palette[1][1]}, ${palette[1][2]})`;
-                const shadowColor = `rgba(${palette[0][0]}, ${palette[0][1]}, ${palette[0][2]}, 0.6)`;
-
-                // Determine if text should be white or black based on primary color brightness
-                const brightness =
-                  (palette[0][0] * 299 +
-                    palette[0][1] * 587 +
-                    palette[0][2] * 114) /
-                  1000;
-                const textColor = brightness < 128 ? "#ffffff" : "#000000";
-
-                updatedCards[i].colors = {
-                  primary: primaryColor,
-                  secondary: secondaryColor,
-                  text: textColor,
-                  shadow: shadowColor,
-                };
-              } catch (error) {
-                console.error("Error extracting colors:", error);
-              }
-              resolve(null);
-            };
-          });
-        } catch (error) {
-          console.error("Error loading image:", error);
-        }
-      }
-
-      setCards(updatedCards);
-      setExtractedColors(true);
-      setLoading(false);
+    img.onload = () => {
+      clearTimeout(timeoutId);
+      resolve(img);
     };
 
-    extractColors();
-  }, [cards, extractedColors]);
+    img.onerror = () => {
+      clearTimeout(timeoutId);
+      reject(new Error("Image loading error"));
+    };
+  });
+};
+
+// Function to extract colors safely with fallback
+const extractCardColors = async (card: CardData, colorThief: ColorThief) => {
+  try {
+    const img = await loadImageWithTimeout(card.imageUrl);
+    const palette = colorThief.getPalette(img, 3);
+
+    // Convert RGB to hex and create color scheme
+    const primaryColor = `rgb(${palette[0][0]}, ${palette[0][1]}, ${palette[0][2]})`;
+    const secondaryColor = `rgb(${palette[1][0]}, ${palette[1][1]}, ${palette[1][2]})`;
+    const shadowColor = `rgba(${palette[0][0]}, ${palette[0][1]}, ${palette[0][2]}, 0.6)`;
+
+    // Determine if text should be white or black based on primary color brightness
+    const brightness =
+      (palette[0][0] * 299 + palette[0][1] * 587 + palette[0][2] * 114) / 1000;
+    const textColor = brightness < 128 ? "#ffffff" : "#000000";
+
+    return {
+      primary: primaryColor,
+      secondary: secondaryColor,
+      text: textColor,
+      shadow: shadowColor,
+    };
+  } catch (error) {
+    console.error(`Error extracting colors for card ${card.id}:`, error);
+    // Return the default colors if extraction fails
+    return card.colors;
+  }
+};
+
+export default function CardStack() {
+  const [cards, setCards] = useState<CardData[]>(initialCards);
+  const [isLoadingColors, setIsLoadingColors] = useState(true);
+  // Track if initial card render has happened
+  const [hasInitialRender, setHasInitialRender] = useState(false);
+
+  // Extract colors in parallel and show cards immediately
+  useEffect(() => {
+    // Show initial cards with default colors immediately
+    if (!hasInitialRender) {
+      setHasInitialRender(true);
+      setIsLoadingColors(true);
+    }
+
+    // Don't block rendering with color extraction
+    const colorThief = new ColorThief();
+
+    const extractColorsInParallel = async () => {
+      try {
+        // Process all images in parallel
+        const colorPromises = cards.map((card) =>
+          extractCardColors(card, colorThief)
+        );
+
+        // Wait for all color extractions to complete or timeout
+        const results = await Promise.allSettled(colorPromises);
+
+        // Update cards with extracted colors
+        setCards((prevCards) =>
+          prevCards.map((card, index) => {
+            const result = results[index];
+            if (result.status === "fulfilled") {
+              return {
+                ...card,
+                colors: result.value,
+              };
+            }
+            return card;
+          })
+        );
+      } catch (err) {
+        console.error("Error extracting colors:", err);
+      } finally {
+        setIsLoadingColors(false);
+      }
+    };
+
+    // Start color extraction but don't wait for it to render cards
+    extractColorsInParallel();
+  }, []); // Empty dependency array ensures it only runs once
 
   const removeCard = (id: number) => {
     setCards((prevCards) => {
@@ -204,16 +246,22 @@ export default function CardStack() {
     }
   };
 
-  if (loading) {
+  // Render a loading skeleton if we haven't had our initial render
+  if (!hasInitialRender) {
     return (
       <div className="flex h-96 w-full items-center justify-center">
-        Loading cards...
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
       </div>
     );
   }
 
   return (
     <div className="relative h-[600px] w-full">
+      {isLoadingColors && (
+        <div className="absolute right-4 top-4 z-50 rounded-full bg-black bg-opacity-50 px-3 py-1 text-xs text-white">
+          Enhancing colors...
+        </div>
+      )}
       <AnimatePresence mode="popLayout">
         {cards.slice(0, 3).map((card, index) => (
           <Card
