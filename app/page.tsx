@@ -78,7 +78,7 @@ function ElegantShape({
   );
 }
 
-export default function HeroGeometric({
+export default function Home({
   badge = "PairPlay 😶‍🌫️",
   title1 = "Games for 2",
   title2 = "Sparks for you",
