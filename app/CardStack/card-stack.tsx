@@ -256,7 +256,7 @@ export default function CardStack() {
   }
 
   return (
-    <div className="relative h-[600px] w-full">
+    <div className="relative h-[600px] w-full px-4 md:px-8 py-8">
       {isLoadingColors && (
         <div className="absolute right-4 top-4 z-50 rounded-full bg-black bg-opacity-50 px-3 py-1 text-xs text-white">
           Enhancing colors...
